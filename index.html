@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+  </head>
+  <body>
+    <title>Image Border</title>
+    <h1>Image Border App</h1>
+
+    
+    <form id="options-form">
+      <label for="border-width">Border Width (in pixels):</label>
+      <input type="number" id="border-width" name="border-width" required />
+
+      <label for="border-color">Border Color:</label>
+      <input type="color" id="border-color" name="border-color" required />
+
+      <label for="border-type">Border Type:</label>
+      <select id="border-type" name="border-type" required>
+        <option value="inner">Inner</option>
+        <option value="outer">Outer</option>
+      </select>
+
+      <input type="file" id="upload" multiple required />
+      
+      <button type="submit">Add Border</button>
+    </form>
+
+    
+    <canvas id="canvas" width="1000"></canvas>
+    <div id="preview"></div>
+
+    <button id="download-button" disabled>Download All Images</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
