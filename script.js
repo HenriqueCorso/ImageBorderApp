@@ -1,9 +1,11 @@
 const main = () => {
+  const processedImages = [];
+
   const addBorderToImage = (image, borderWidth, borderColor, borderType) => {
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
 
-    canvas.width = 1000 * (image.height / image.width);;
+    canvas.width = 1000;
     canvas.height = 1000 * (image.height / image.width);
 
     context.drawImage(image, 0, 0, canvas.width, canvas.height);
@@ -27,6 +29,8 @@ const main = () => {
   const processImages = (files, borderWidth, borderColor, borderType) => {
     const previewDiv = document.getElementById('preview');
     previewDiv.innerHTML = '';
+
+    processedImages.length = 0;
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
@@ -57,11 +61,44 @@ const main = () => {
           });
 
           previewDiv.appendChild(borderedImage);
+          processedImages.push(borderedImageUrl);
+
+          updateDownloadButton();
         };
       };
 
       reader.readAsDataURL(file);
     }
+  };
+
+  const updateDownloadButton = () => {
+    const downloadButton = document.getElementById('download-button');
+    if (processedImages.length > 0) {
+      downloadButton.removeAttribute('disabled');
+    } else {
+      downloadButton.setAttribute('disabled', 'disabled');
+    }
+  };
+
+  const downloadImages = () => {
+    if (processedImages.length === 0) {
+      return;
+    }
+
+    const zip = new JSZip();
+
+    processedImages.forEach((imageUrl, index) => {
+      fetch(imageUrl)
+        .then((response) => response.blob())
+        .then((blob) => {
+          zip.file(`image_${index + 1}.png`, blob);
+          if (index === processedImages.length - 1) {
+            zip.generateAsync({ type: 'blob' }).then((content) => {
+              saveAs(content, 'processed_images.zip');
+            });
+          }
+        });
+    });
   };
 
   document.getElementById('options-form').addEventListener('submit', (e) => {
@@ -74,7 +111,10 @@ const main = () => {
 
     processImages(files, borderWidth, borderColor, borderType);
   });
+
+  document.getElementById('download-button').addEventListener('click', () => {
+    downloadImages();
+  });
 };
 
 main();
-
