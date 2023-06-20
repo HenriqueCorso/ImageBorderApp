@@ -1,6 +1,7 @@
 const main = () => {
   const processedImages = [];
 
+  // add inner border to the image
   const addInnerBorderToImage = (image, borderWidth, borderColor) => {
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
@@ -8,18 +9,23 @@ const main = () => {
     canvas.width = image.width;
     canvas.height = image.height;
 
-    context.fillStyle = borderColor;
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(image, borderWidth, borderWidth, image.width - 2 * borderWidth, image.height - 2 * borderWidth);
+    context.drawImage(image, 0, 0);
 
+    // draw inner borders
     context.strokeStyle = borderColor;
     context.lineWidth = borderWidth;
-    context.strokeRect(borderWidth, borderWidth, image.width - 2 * borderWidth, image.height - 2 * borderWidth);
+    context.strokeRect(borderWidth / 2, borderWidth / 2, canvas.width - borderWidth, canvas.height - borderWidth);
+    context.fillStyle = borderColor;
+    context.fillRect(0, 0, borderWidth, canvas.height);
+    context.fillRect(canvas.width - borderWidth, 0, borderWidth, canvas.height);
+    context.fillRect(borderWidth, 0, canvas.width - 2 * borderWidth, borderWidth);
+    context.fillRect(borderWidth, canvas.height - borderWidth, canvas.width - 2 * borderWidth, borderWidth);
 
     const dataUrl = canvas.toDataURL();
     return dataUrl;
   };
 
+  // add outer border to the image
   const addOuterBorderToImage = (image, borderWidth, borderColor) => {
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
@@ -30,6 +36,7 @@ const main = () => {
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
 
+    // draw the outer border
     context.strokeStyle = borderColor;
     context.lineWidth = borderWidth;
     context.strokeRect(borderWidth / 2, borderWidth / 2, canvasWidth - borderWidth, canvasHeight - borderWidth);
@@ -39,12 +46,14 @@ const main = () => {
     return dataUrl;
   };
 
+  // process selected images with borders
   const processImages = (files, borderWidth, borderColor, borderType) => {
     const previewDiv = document.getElementById('preview');
     previewDiv.innerHTML = '';
 
     processedImages.length = 0;
 
+    // loop over each selected file
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const reader = new FileReader();
@@ -55,6 +64,7 @@ const main = () => {
 
         image.onload = () => {
           let borderedImageUrl;
+          // add border based on the selected border type
           if (borderType === 'inner') {
             borderedImageUrl = addInnerBorderToImage(image, borderWidth, borderColor);
           } else if (borderType === 'outer') {
@@ -65,6 +75,7 @@ const main = () => {
           borderedImage.src = borderedImageUrl;
           borderedImage.className = 'preview-image';
 
+          // display the clicked image on the canvas
           borderedImage.addEventListener('click', () => {
             const canvas = document.getElementById('canvas');
             const context = canvas.getContext('2d');
@@ -73,6 +84,7 @@ const main = () => {
             context.drawImage(borderedImage, 0, 0, canvas.width, canvas.height);
           });
 
+          // add the borderedImage to the previewDiv
           previewDiv.appendChild(borderedImage);
           processedImages.push(borderedImageUrl);
 
@@ -80,19 +92,12 @@ const main = () => {
         };
       };
 
+
       reader.readAsDataURL(file);
     }
   };
 
-  const updateDownloadButton = () => {
-    const downloadButton = document.getElementById('download-button');
-    if (processedImages.length > 0) {
-      downloadButton.removeAttribute('disabled');
-    } else {
-      downloadButton.setAttribute('disabled', 'disabled');
-    }
-  };
-
+  // download all processed images as a zip file
   const downloadImages = () => {
     if (processedImages.length === 0) {
       return;
@@ -114,7 +119,6 @@ const main = () => {
     });
   };
 
-  // Event listener for the form submission
   document.getElementById('options-form').addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -126,7 +130,6 @@ const main = () => {
     processImages(files, borderWidth, borderColor, borderType);
   });
 
-  // Event listener for the download button
   document.getElementById('download-button').addEventListener('click', () => {
     downloadImages();
   });
