@@ -1,7 +1,7 @@
 const main = () => {
   const processedImages = [];
 
-  const addBorderToImage = (image, borderWidth, borderColor, borderType) => {
+  const addInnerBorderToImage = (image, borderWidth, borderColor) => {
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
 
@@ -11,22 +11,32 @@ const main = () => {
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
 
-    if (borderType === 'outer') {
-      context.strokeStyle = borderColor;
-      context.lineWidth = borderWidth;
-      context.strokeRect(borderWidth / 2, borderWidth / 2, canvasWidth - borderWidth, canvasHeight - borderWidth);
-    } else if (borderType === 'inner') {
-      context.fillStyle = borderColor;
-      context.fillRect(0, 0, canvasWidth, canvasHeight);
-    }
-
+    context.fillStyle = borderColor;
+    context.fillRect(0, 0, canvasWidth, canvasHeight);
     context.drawImage(image, borderWidth, borderWidth, image.width, image.height);
 
-    if (borderType === 'inner') {
-      context.strokeStyle = borderColor;
-      context.lineWidth = borderWidth;
-      context.strokeRect(borderWidth, borderWidth, image.width, image.height);
-    }
+    context.strokeStyle = borderColor;
+    context.lineWidth = borderWidth;
+    context.strokeRect(borderWidth, borderWidth, image.width, image.height);
+
+    const dataUrl = canvas.toDataURL();
+    return dataUrl;
+  };
+
+  const addOuterBorderToImage = (image, borderWidth, borderColor) => {
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+
+    const canvasWidth = image.width + 2 * borderWidth;
+    const canvasHeight = image.height + 2 * borderWidth;
+
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
+    context.strokeStyle = borderColor;
+    context.lineWidth = borderWidth;
+    context.strokeRect(borderWidth / 2, borderWidth / 2, canvasWidth - borderWidth, canvasHeight - borderWidth);
+    context.drawImage(image, borderWidth, borderWidth, image.width, image.height);
 
     const dataUrl = canvas.toDataURL();
     return dataUrl;
@@ -47,12 +57,12 @@ const main = () => {
         image.src = e.target.result;
 
         image.onload = () => {
-          const borderedImageUrl = addBorderToImage(
-            image,
-            borderWidth,
-            borderColor,
-            borderType
-          );
+          let borderedImageUrl;
+          if (borderType === 'inner') {
+            borderedImageUrl = addInnerBorderToImage(image, borderWidth, borderColor);
+          } else if (borderType === 'outer') {
+            borderedImageUrl = addOuterBorderToImage(image, borderWidth, borderColor);
+          }
 
           const borderedImage = new Image();
           borderedImage.src = borderedImageUrl;
@@ -107,6 +117,7 @@ const main = () => {
     });
   };
 
+  // Event listener for the form submission
   document.getElementById('options-form').addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -118,6 +129,7 @@ const main = () => {
     processImages(files, borderWidth, borderColor, borderType);
   });
 
+  // Event listener for the download button
   document.getElementById('download-button').addEventListener('click', () => {
     downloadImages();
   });
