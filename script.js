@@ -5,19 +5,16 @@ const main = () => {
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
 
-    const canvasWidth = image.width + 2 * borderWidth;
-    const canvasHeight = image.height + 2 * borderWidth;
-
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
+    canvas.width = image.width;
+    canvas.height = image.height;
 
     context.fillStyle = borderColor;
-    context.fillRect(0, 0, canvasWidth, canvasHeight);
-    context.drawImage(image, borderWidth, borderWidth, image.width, image.height);
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, borderWidth, borderWidth, image.width - 2 * borderWidth, image.height - 2 * borderWidth);
 
     context.strokeStyle = borderColor;
     context.lineWidth = borderWidth;
-    context.strokeRect(borderWidth, borderWidth, image.width, image.height);
+    context.strokeRect(borderWidth, borderWidth, image.width - 2 * borderWidth, image.height - 2 * borderWidth);
 
     const dataUrl = canvas.toDataURL();
     return dataUrl;
