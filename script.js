@@ -5,21 +5,27 @@ const main = () => {
     const canvas = document.getElementById('canvas');
     const context = canvas.getContext('2d');
 
-    canvas.width = 1000;
-    canvas.height = 1000 * (image.height / image.width);
+    const canvasWidth = image.width + 2 * borderWidth;
+    const canvasHeight = image.height + 2 * borderWidth;
 
-    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
 
     if (borderType === 'outer') {
       context.strokeStyle = borderColor;
       context.lineWidth = borderWidth;
-      context.strokeRect(0, 0, canvas.width, canvas.height);
+      context.strokeRect(borderWidth / 2, borderWidth / 2, canvasWidth - borderWidth, canvasHeight - borderWidth);
     } else if (borderType === 'inner') {
       context.fillStyle = borderColor;
-      context.fillRect(0, 0, canvas.width, borderWidth);
-      context.fillRect(0, 0, borderWidth, canvas.height);
-      context.fillRect(0, canvas.height - borderWidth, canvas.width, borderWidth);
-      context.fillRect(canvas.width - borderWidth, 0, borderWidth, canvas.height);
+      context.fillRect(0, 0, canvasWidth, canvasHeight);
+    }
+
+    context.drawImage(image, borderWidth, borderWidth, image.width, image.height);
+
+    if (borderType === 'inner') {
+      context.strokeStyle = borderColor;
+      context.lineWidth = borderWidth;
+      context.strokeRect(borderWidth, borderWidth, image.width, image.height);
     }
 
     const dataUrl = canvas.toDataURL();
